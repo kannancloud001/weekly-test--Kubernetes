@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  selector:
+    matchLabels:
+      app: backend
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+        - name: backend
+          image: "gcr.io/google-samples/hello-go-gke:1.0"
+          ports:
+            - containerPort: 80
+          env:   # Setting Environmental Variables
+            - name: DB_HOST   # Setting Database host address
+              value: mysql
+            - name: DB_NAME  # Setting Database name
+              value: fleetdb
+            - name: DB_USERNAME  # Setting Database username
+              value: root
+            - name: DB_PASSWORD # Setting Database password
+              value: root
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: fleetms-service
+spec:
+  ports:
+    - protocol: "TCP"
+      port: 80    # Port inside the cluster
+      targetPort: 80   # Port exposed to the outside
+  selector:
+    app: backend
+  type: NodePort
